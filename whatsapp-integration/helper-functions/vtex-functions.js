@@ -39,12 +39,12 @@ const getPriceBySKU = async (SKUId) => {
   return results;
 };
 
-// This function returns a parsed object with product id, name, link, description and price
 const getProductsInfoBySearchTerm = async (searchTerm) => {
   const products = await getProductsBySearchTerm(searchTerm);
 
   const parsedProducts = products.map((product) => {
-    const { productId, productName, link, description, price } = product;
+    const { productId, productName, link, description } = product;
+    const price = await getPriceBySKU(productId).basePrice;
     return {
       productId,
       productName,
@@ -56,6 +56,8 @@ const getProductsInfoBySearchTerm = async (searchTerm) => {
 
   return parsedProducts;
 };
+
+// TODO getProductsInfoByCategory
 
 module.exports = {
   getProductsBySearchTerm,
