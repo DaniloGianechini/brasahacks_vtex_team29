@@ -18,18 +18,6 @@ const sendMessage = async (message, senderID) => {
   }
 };
 
-// TODO: Implement the different messages
-// Function to handle messages sent
-// Returns the message to be sent to the user
-const onMessage = (message) => {
-  switch (
-    message
-    // Check for every case and return the appropriate message
-  ) {
-  }
-};
-
 module.exports = {
   sendMessage,
-  onMessage,
 };

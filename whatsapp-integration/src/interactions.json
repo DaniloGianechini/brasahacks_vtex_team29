@@ -1,0 +1,47 @@
+{
+  "interacao-1": {
+    "body": [
+      "Essa é uma mensagem teste, com algumas opcões para o usuário escolher.",
+      "\nQual sua comida favorita?\n\n*1*) Pizza\n*2*) Strogonoff\n*3*) Sushi\n\nDigite um dos números para escolher."
+    ],
+    "isDynamic": false,
+    "relations": [
+      {
+        "keyword": "1",
+        "nextInteraction": "resposta-comida"
+      },
+      {
+        "keyword": "2",
+        "nextInteraction": "resposta-comida"
+      },
+      {
+        "keyword": "3",
+        "nextInteraction": "resposta-comida"
+      }
+    ]
+  },
+  "resposta-comida": {
+    "body": [
+      "This is a dynamic message. This content will be defined by the action function."
+    ],
+    "isDynamic": true,
+    "identifierMessage": [
+      "Essa comida é deliciosa mesmo. Deseja mais alguma coisa?\n\nDigite *sim* para repetir a mensagem, e *não* para sair."
+    ],
+    "relations": [
+      {
+        "keyword": "sim",
+        "nextInteraction": "interacao-1"
+      },
+      {
+        "keyword": "não",
+        "nextInteraction": "despedida"
+      }
+    ]
+  },
+  "despedida": {
+    "body": ["Até logo! Te vejo mais tarde hem"],
+    "isDynamic": false,
+    "relations": []
+  }
+}
