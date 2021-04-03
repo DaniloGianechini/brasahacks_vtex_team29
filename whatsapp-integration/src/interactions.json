@@ -26,7 +26,7 @@
     ],
     "isDynamic": true,
     "identifierMessage": [
-      "Essa comida é deliciosa mesmo. Deseja mais alguma coisa?\n\nDigite *sim* para repetir a mensagem, e *não* para sair."
+      "Deseja mais alguma coisa?\n\nDigite *sim* para repetir a mensagem, e *não* para sair."
     ],
     "relations": [
       {
@@ -34,7 +34,7 @@
         "nextInteraction": "interacao-1"
       },
       {
-        "keyword": "não",
+        "keyword": ["não", "nao"],
         "nextInteraction": "despedida"
       }
     ]
@@ -42,6 +42,11 @@
   "despedida": {
     "body": ["Até logo! Te vejo mais tarde hem"],
     "isDynamic": false,
-    "relations": []
+    "relations": [
+      {
+        "keyword": "_ANY_",
+        "nextInteraction": "interacao-1"
+      }
+    ]
   }
 }

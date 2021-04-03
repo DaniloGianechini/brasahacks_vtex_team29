@@ -1,13 +1,14 @@
 const fetch = require("node-fetch");
 
 const doVtexRequest = async (url) => {
-  const appKey = process.env.APP_KEY;
-  const appToken = process.env.APP_TOKEN;
+  const appKey = process.env.VTEX_APP_KEY;
+  const appToken = process.env.VTEX_APP_TOKEN;
 
   const options = {
     method: "GET",
     headers: {
       Accept: "application/json; charset=utf-8",
+      "Content-Type": "application/json",
       "X-VTEX-API-AppKey": appKey,
       "X-VTEX-API-AppToken": appToken,
     },
@@ -42,7 +43,8 @@ const getPriceBySKU = async (SKUId) => {
 const getProductsInfoBySearchTerm = async (searchTerm) => {
   const products = await getProductsBySearchTerm(searchTerm);
 
-  const parsedProducts = products.map((product) => {
+  const parsedProducts = products.map(async (product) => {
+    // BUG I'm not sure, but maybe the productId is not the SKU, I don't know
     const { productId, productName, link, description } = product;
     const price = await getPriceBySKU(productId).basePrice;
     return {
@@ -57,7 +59,7 @@ const getProductsInfoBySearchTerm = async (searchTerm) => {
   return parsedProducts;
 };
 
-// TODO getProductsInfoByCategory
+getProductsInfoBySearchTerm("skin").then((res) => console.log(res));
 
 module.exports = {
   getProductsBySearchTerm,

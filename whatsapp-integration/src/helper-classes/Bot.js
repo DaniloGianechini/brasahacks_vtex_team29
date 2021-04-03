@@ -1,37 +1,32 @@
-const fs = require("fs");
-
 const accountSid = process.env.TWILIO_ACCOUNT_SID; // Your Account SID from www.twilio.com/console
 const authToken = process.env.TWILIO_AUTH_TOKEN; // Your Auth Token from www.twilio.com/console
 
-const client = require("twilio")(accountSid, authToken, {
-  lazyLoading: true,
-});
+// TODO DEBUGGING ❗❗❗ UNCOMMENT THIS
+
+// const client = require("twilio")(accountSid, authToken, {
+//   lazyLoading: true,
+// });
 
 class Bot {
   constructor(firstInteractionName) {
     this.interactions = {};
     this.firstInteractionName = firstInteractionName;
+
+    // debugging
+    this.lastMessage = "";
   }
 
-  async defineInteractionsByJSON(filepath) {
-    await new Promise((resolve) => {
-      fs.readFile(filepath, "utf8", (err, data) => {
-        if (err) return console.error(err);
+  async defineInteractionsByObject(object) {
+    const interactions = object;
 
-        const interactions = JSON.parse(data);
-
-        for (const interaction of Object.entries(interactions)) {
-          this.interactions[interaction[0]] = {
-            body: interaction[1].body,
-            relations: interaction[1].relations,
-            isDynamic: interaction[1].isDynamic,
-            identifierMessage: interaction[1].identifierMessage,
-          };
-        }
-
-        resolve();
-      });
-    });
+    for (const interaction of Object.entries(interactions)) {
+      this.interactions[interaction[0]] = {
+        body: interaction[1].body,
+        relations: interaction[1].relations,
+        isDynamic: interaction[1].isDynamic,
+        identifierMessage: interaction[1].identifierMessage,
+      };
+    }
 
     return this.interactions;
   }
@@ -48,11 +43,14 @@ class Bot {
     // Get last message sent by the bot to the user
     // DANILOOO ❗❗❗❗❗❗❗ eu nao consigo testar isso aqui não, por favor ve pra mim se ele pega a última mensagem mesmo.
     //   Eu so copiei o codigo da documentação deles, eu não sei se ta certo
-    const lastBotMessage = await client.messages.list({
-      from: "whatsapp:+14155238886",
-      to: senderID,
-      limit: 20,
-    }).messages[0];
+    // const lastBotMessage = await client.messages.list({
+    //   from: "whatsapp:+14155238886",
+    //   to: senderID,
+    //   limit: 20,
+    // }).messages[0];
+
+    // TODO DEBUGGING ❗❗❗ REMOVE THIS
+    const lastBotMessage = this.lastMessage;
 
     // If lastBotMessage is undefined, it is the first interaction, and thus it is necessary to send the initial message
     if (!lastBotMessage) {
@@ -71,7 +69,7 @@ class Bot {
     let interactionTitle = null;
 
     for (const relation of currentInteraction.relations) {
-      if (relation.keyword == userInput) {
+      if (relation.keyword.includes(userInput) || relation.keyword == "_ANY_") {
         interactionTitle = relation.nextInteraction;
       }
     }
@@ -80,10 +78,15 @@ class Bot {
 
     // If no interaction was found, user typed something wrong. Return the previous message with a warning
     if (!interactionTitle) {
-      return [
-        "Ops, não entendi... Você pode tentar de novo?",
-        ...currentInteraction.body,
-      ];
+      return !currentInteraction.isDynamic
+        ? [
+            "Ops, não entendi... Você pode tentar de novo?",
+            ...currentInteraction.body,
+          ]
+        : [
+            "Ops, não entendi... Você pode tentar de novo?",
+            ...currentInteraction.action(currentInteraction, userInput),
+          ];
     }
 
     // Check if next interaction is dynamic or not. If it is, let the action return the message. If not, return the static message
@@ -123,6 +126,8 @@ class Bot {
 // -------- TESTS ----------
 
 async function doTest() {
+  const prompt = require("prompt-sync")({ sigint: true });
+
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   const bot = new Bot("interacao-1");
@@ -156,27 +161,35 @@ async function doTest() {
         ];
         break;
       default:
-        message = ["Essa comida nunca ouvi falar viu"];
+        break;
     }
 
     return [...message, ...currentInteraction.identifierMessage];
   }
 
-  // Define possible interactions
-  bot.defineInteractionsByJSON("./interactions.json").then(() => {
+  fs.readFile(path.join(__dirname, "..", "interactions.json"), (err, data) => {
+    if (err) console.error(err);
+
+    // Define possible interactions
+    bot.defineInteractionsByObject(JSON.parse(data));
+
     // Add the action to the proper interaction
     bot.defineActionByInteractionName("resposta-comida", handleFoodAnswer);
+    console.log(bot.interactions);
   });
 
-  await sleep(100);
+  while (true) {
+    await sleep(100);
 
-  const answers = await bot.handleUserMessage("sim");
+    const answers = await bot.handleUserMessage(prompt());
 
-  // Write a function to send message back to WhatsApp
-  for (const answer of answers) {
-    console.log(answer);
-    // Add a timer to make the interaction more organic
-    await sleep(800);
+    // Write a function to send message back to WhatsApp
+    for (const answer of answers) {
+      if (answer) console.log(answer);
+      bot.lastMessage = answer;
+      // Add a timer to make the interaction more organic
+      await sleep(700);
+    }
   }
 }
 

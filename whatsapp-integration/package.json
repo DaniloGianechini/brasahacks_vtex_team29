@@ -11,5 +11,8 @@
     "express": "^4.17.1",
     "node-fetch": "^2.6.1",
     "twilio": "^3.43.1"
+  },
+  "devDependencies": {
+    "prompt-sync": "^4.2.0"
   }
 }
