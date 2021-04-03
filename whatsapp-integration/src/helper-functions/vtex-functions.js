@@ -20,38 +20,23 @@ const doVtexRequest = async (url) => {
   return results;
 };
 
-const getProductsBySearchTerm = async (searchTerm) => {
+const getProductsInfoBySearchTerm = async (searchTerm) => {
   const url = `https://cosmetics2.vtexcommercestable.com.br/api/catalog_system/pub/products/search/${searchTerm}`;
 
-  const results = await doVtexRequest(url);
+  const products = await doVtexRequest(url);
 
-  // results is an array of objects folowing this structure: https://developers.vtex.com/vtex-rest-api/reference/search-3#productsearch
-
-  return results;
-};
-
-const getPriceBySKU = async (SKUId) => {
-  const url = `https://api.vtex.com/apiexamples/pricing/prices/${SKUId}`;
-
-  const results = await doVtexRequest(url);
-
-  // results is an array of objects folowing this structure: https://developers.vtex.com/vtex-rest-api/reference/prices-and-fixed-prices#getprice
-
-  return results;
-};
-
-const getProductsInfoBySearchTerm = async (searchTerm) => {
-  const products = await getProductsBySearchTerm(searchTerm);
-
-  const parsedProducts = products.map(async (product) => {
-    // BUG I'm not sure, but maybe the productId is not the SKU, I don't know
-    const { productId, productName, link, description } = product;
-    const price = await getPriceBySKU(productId).basePrice;
+  const parsedProducts = products.map((product) => {
+    // BUG I'm not sure, but maybe the productId is not the SKU, I don't know. For now I'll assume it isn't
+    const { productName, link, description } = product;
+    const imageUrl = product.items[0].images[0].imageUrl;
+    const addToCartLink = product.items[0].sellers[0].addToCartLink;
+    const price = product.items[0].sellers[0].commertialOffer.Price;
     return {
-      productId,
       productName,
       link,
       description,
+      imageUrl,
+      addToCartLink,
       price,
     };
   });
@@ -59,10 +44,11 @@ const getProductsInfoBySearchTerm = async (searchTerm) => {
   return parsedProducts;
 };
 
-getProductsInfoBySearchTerm("skin").then((res) => console.log(res));
+async function test() {
+  const products = await getProductsInfoBySearchTerm("");
+  console.log(products[0]);
+}
 
 module.exports = {
-  getProductsBySearchTerm,
-  getPriceBySKU,
   getProductsInfoBySearchTerm,
 };

@@ -74,7 +74,6 @@ fs.readFile(path.join(__dirname, "interactions.json"), (err, data) => {
 
   // Add the action to the proper interaction
   bot.defineActionByInteractionName("resposta-comida", handleFoodAnswer);
-  console.log(bot.interactions);
 });
 
 // Route for WhatsApp

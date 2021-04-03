@@ -3,9 +3,9 @@ const authToken = process.env.TWILIO_AUTH_TOKEN; // Your Auth Token from www.twi
 
 // TODO DEBUGGING ❗❗❗ UNCOMMENT THIS
 
-// const client = require("twilio")(accountSid, authToken, {
-//   lazyLoading: true,
-// });
+const client = require("twilio")(accountSid, authToken, {
+  lazyLoading: true,
+});
 
 class Bot {
   constructor(firstInteractionName) {
@@ -13,7 +13,7 @@ class Bot {
     this.firstInteractionName = firstInteractionName;
 
     // debugging
-    this.lastMessage = "";
+    // this.lastMessage = "";
   }
 
   async defineInteractionsByObject(object) {
@@ -42,15 +42,15 @@ class Bot {
 
     // Get last message sent by the bot to the user
     // DANILOOO ❗❗❗❗❗❗❗ eu nao consigo testar isso aqui não, por favor ve pra mim se ele pega a última mensagem mesmo.
-    //   Eu so copiei o codigo da documentação deles, eu não sei se ta certo
-    // const lastBotMessage = await client.messages.list({
-    //   from: "whatsapp:+14155238886",
-    //   to: senderID,
-    //   limit: 20,
-    // }).messages[0];
+    // Eu so copiei o codigo da documentação deles, eu não sei se ta certo
+    const lastBotMessage = await client.messages.list({
+      from: "whatsapp:+14155238886",
+      to: senderID,
+      limit: 20,
+    }).messages[0];
 
     // TODO DEBUGGING ❗❗❗ REMOVE THIS
-    const lastBotMessage = this.lastMessage;
+    // const lastBotMessage = this.lastMessage;
 
     // If lastBotMessage is undefined, it is the first interaction, and thus it is necessary to send the initial message
     if (!lastBotMessage) {
@@ -126,6 +126,9 @@ class Bot {
 // -------- TESTS ----------
 
 async function doTest() {
+  const fs = require("fs");
+  const path = require("path");
+
   const prompt = require("prompt-sync")({ sigint: true });
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -175,7 +178,6 @@ async function doTest() {
 
     // Add the action to the proper interaction
     bot.defineActionByInteractionName("resposta-comida", handleFoodAnswer);
-    console.log(bot.interactions);
   });
 
   while (true) {
