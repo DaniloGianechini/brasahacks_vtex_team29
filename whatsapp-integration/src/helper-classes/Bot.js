@@ -2,9 +2,9 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID; // Your Account SID from www.
 const authToken = process.env.TWILIO_AUTH_TOKEN; // Your Auth Token from www.twilio.com/console
 
 // TODO DEBUGGING ❗❗❗ UNCOMMENT THIS
-// const client = require("twilio")(accountSid, authToken, {
-//   lazyLoading: true,
-// });
+const client = require("twilio")(accountSid, authToken, {
+  lazyLoading: true,
+});
 
 class Bot {
   constructor(firstInteractionName) {
@@ -12,7 +12,7 @@ class Bot {
     this.firstInteractionName = firstInteractionName;
 
     // debugging
-    this.lastMessage = "";
+    // this.lastMessage = "";
   }
 
   async defineInteractionsByObject(object) {
@@ -42,14 +42,14 @@ class Bot {
     // Get last message sent by the bot to the user
     // DANILOOO ❗❗❗❗❗❗❗ eu nao consigo testar isso aqui não, por favor ve pra mim se ele pega a última mensagem mesmo.
     // Eu so copiei o codigo da documentação deles, eu não sei se ta certovt
-    // const lastBotMessage = await client.messages.list({
-    //   from: "whatsapp:+14155238886",
-    //   to: senderID,
-    //   limit: 20,
-    // }).messages[0];
+    const lastBotMessage = await client.messages.list({
+      from: "whatsapp:+14155238886",
+      to: senderID,
+      limit: 20,
+    }).messages[0];
 
     // TODO DEBUGGING ❗❗❗ REMOVE THIS
-    const lastBotMessage = this.lastMessage;
+    // const lastBotMessage = this.lastMessage;
 
     // If lastBotMessage is undefined, it is the first interaction, and thus it is necessary to send the initial message
     if (!lastBotMessage) {
@@ -176,6 +176,6 @@ async function doTest() {
   }
 }
 
-doTest();
+// doTest();
 
 module.exports = Bot;
