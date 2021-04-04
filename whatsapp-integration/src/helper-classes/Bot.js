@@ -2,9 +2,9 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID; // Your Account SID from www.
 const authToken = process.env.TWILIO_AUTH_TOKEN; // Your Auth Token from www.twilio.com/console
 
 // TODO DEBUGGING ❗❗❗ UNCOMMENT THIS
-const client = require("twilio")(accountSid, authToken, {
-  lazyLoading: true,
-});
+// const client = require("twilio")(accountSid, authToken, {
+//   lazyLoading: true,
+// });
 
 class Bot {
   constructor(firstInteractionName) {
@@ -12,7 +12,7 @@ class Bot {
     this.firstInteractionName = firstInteractionName;
 
     // debugging
-    // this.lastMessage = "";
+    this.lastMessage = "";
   }
 
   async defineInteractionsByObject(object) {
@@ -42,14 +42,14 @@ class Bot {
     // Get last message sent by the bot to the user
     // DANILOOO ❗❗❗❗❗❗❗ eu nao consigo testar isso aqui não, por favor ve pra mim se ele pega a última mensagem mesmo.
     // Eu so copiei o codigo da documentação deles, eu não sei se ta certovt
-    const lastBotMessage = await client.messages.list({
-      from: "whatsapp:+14155238886",
-      to: senderID,
-      limit: 20,
-    }).messages[0];
+    // const lastBotMessage = await client.messages.list({
+    //   from: "whatsapp:+14155238886",
+    //   to: senderID,
+    //   limit: 20,
+    // }).messages[0];
 
     // TODO DEBUGGING ❗❗❗ REMOVE THIS
-    // const lastBotMessage = this.lastMessage;
+    const lastBotMessage = this.lastMessage;
 
     // If lastBotMessage is undefined, it is the first interaction, and thus it is necessary to send the initial message
     if (!lastBotMessage) {
@@ -65,11 +65,12 @@ class Bot {
     const userInput = message.trim().toLowerCase();
 
     // Check which interaction is the next one
-    let interactionTitle = null;
+    let interactionTitle;
 
     for (const relation of currentInteraction.relations) {
       if (relation.keyword.includes(userInput) || relation.keyword == "_ANY_") {
         interactionTitle = relation.nextInteraction;
+        break;
       }
     }
 
@@ -84,7 +85,11 @@ class Bot {
           ]
         : [
             "Ops, não entendi... Você pode tentar de novo?",
-            ...currentInteraction.action(currentInteraction, userInput),
+            ...currentInteraction.action(
+              currentInteraction,
+              nextInteraction,
+              userInput
+            ),
           ];
     }
 
@@ -92,7 +97,11 @@ class Bot {
     if (!nextInteraction.isDynamic) {
       return nextInteraction.body;
     } else {
-      return nextInteraction.action(nextInteraction, userInput);
+      return nextInteraction.action(
+        currentInteraction,
+        nextInteraction,
+        userInput
+      );
     }
   }
 
@@ -132,42 +141,10 @@ async function doTest() {
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-  const bot = new Bot("interacao-1");
+  const bot = new Bot("greeting");
 
-  function handleFoodAnswer(currentInteraction, userInput) {
-    /*
-    Options:
-  
-      1) Pizza
-      2) Strogonoff
-      3) Sushi
-    
-    */
-
-    let message = [""];
-
-    switch (userInput) {
-      case "1":
-        message = [
-          "Hummm pizza é top hem. Minha preferida é frango com catupiry.",
-        ];
-        break;
-      case "2":
-        message = [
-          "Minha nossa senhora strogonoff não é nem comida, é um manjar dos deuses. Que treco bom minha nossa senhora.",
-        ];
-        break;
-      case "3":
-        message = [
-          "Nossa sushi é show também. Hot roll ali é tudo de bom. Salmaozinho top tambem hem.",
-        ];
-        break;
-      default:
-        break;
-    }
-
-    return [...message, ...currentInteraction.identifierMessage];
-  }
+  // Each action has the following structure: {interactionName: _name_, func: _actionFunc_ }
+  const actions = require("./../actions");
 
   fs.readFile(path.join(__dirname, "..", "interactions.json"), (err, data) => {
     if (err) console.error(err);
@@ -176,7 +153,12 @@ async function doTest() {
     bot.defineInteractionsByObject(JSON.parse(data));
 
     // Add the action to the proper interaction
-    bot.defineActionByInteractionName("resposta-comida", handleFoodAnswer);
+    for (action in actions) {
+      bot.defineActionByInteractionName(
+        actions[action].interactionName,
+        actions[action].func
+      );
+    }
   });
 
   while (true) {
@@ -193,5 +175,7 @@ async function doTest() {
     }
   }
 }
+
+doTest();
 
 module.exports = Bot;

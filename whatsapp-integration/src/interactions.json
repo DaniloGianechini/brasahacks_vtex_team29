@@ -1,51 +1,137 @@
 {
-  "interacao-1": {
+  "greeting": {
     "body": [
-      "Essa é uma mensagem teste, com algumas opcões para o usuário escolher.",
-      "\nQual sua comida favorita?\n\n*1*) Pizza\n*2*) Strogonoff\n*3*) Sushi\n\nDigite um dos números para escolher."
+      "Olá! 😄😁\n\nEu sou o assistente virtual da Cosmectics, e irei te ajudar com as suas compras!",
+      "\nDurante todo o nosso atendimento, as palavras que eu posso entender estarão em *negrito*, ok?",
+      "\nVamos começar! Escolha uma das opções abaixo para continuar.\n\n*1*) Procurar um produto ou categoria 🔎\n*2*) Explorar todas as categorias 🛒"
     ],
     "isDynamic": false,
     "relations": [
       {
         "keyword": "1",
-        "nextInteraction": "resposta-comida"
+        "nextInteraction": "search-interface"
       },
       {
         "keyword": "2",
-        "nextInteraction": "resposta-comida"
-      },
-      {
-        "keyword": "3",
-        "nextInteraction": "resposta-comida"
+        "nextInteraction": "categories"
       }
     ]
   },
-  "resposta-comida": {
+  "initial-section": {
     "body": [
-      "This is a dynamic message. This content will be defined by the action function."
+      "Escolha uma das opções abaixo para continuar.\n\n*1*) Procurar um produto ou categoria 🔎\n*2*) Explorar todas as categorias 🛒"
     ],
-    "isDynamic": true,
-    "identifierMessage": [
-      "Deseja mais alguma coisa?\n\nDigite *sim* para repetir a mensagem, e *não* para sair."
-    ],
+    "isDynamic": false,
     "relations": [
       {
-        "keyword": "sim",
-        "nextInteraction": "interacao-1"
+        "keyword": "1",
+        "nextInteraction": "search-interface"
       },
       {
-        "keyword": ["não", "nao"],
-        "nextInteraction": "despedida"
+        "keyword": "2",
+        "nextInteraction": "categories"
       }
     ]
   },
-  "despedida": {
-    "body": ["Até logo! Te vejo mais tarde hem"],
+  "search-interface": {
+    "body": [
+      "Envie a busca que você deseja realizar!",
+      "\nSe voce, por exemplo, estiver procurando por camisas 👕, você pode me mandar: _camisa_."
+    ],
     "isDynamic": false,
     "relations": [
       {
         "keyword": "_ANY_",
-        "nextInteraction": "interacao-1"
+        "nextInteraction": "search-results"
+      }
+    ]
+  },
+  "search-results": {
+    "body": [
+      "This is a dynamic message. If you are seeing this, something went wrong"
+    ],
+    "isDynamic": true,
+    "identifierMessage": [
+      "Esses são os resultados da busca! 🔎\nEnvie o ID do produto para mais informações sobre ele, ou envie *voltar* para retornar ao menu inicial."
+    ],
+    "relations": [
+      {
+        "keyword": "voltar",
+        "nextInteraction": "initial-section"
+      },
+      {
+        "keyword": "_ANY_",
+        "nextInteraction": "product-info"
+      }
+    ]
+  },
+  "categories": {
+    "body": [
+      "This is a dynamic message. If you are seeing this, something went wrong"
+    ],
+    "isDynamic": true,
+    "identifierMessage": [
+      "Essas são as categorias disponíveis! 🛍\nEnvie o ID da categoria para visualizar seus produtos, ou envie *voltar* para retornar ao menu inicial."
+    ],
+    "relations": [
+      {
+        "keyword": "voltar",
+        "nextInteraction": "initial-section"
+      },
+      {
+        "keyword": "_ANY_",
+        "nextInteraction": "category-products"
+      }
+    ]
+  },
+  "category-products": {
+    "body": [
+      "This is a dynamic message. If you are seeing this, something went wrong"
+    ],
+    "isDynamic": true,
+    "identifierMessage": [
+      "Esses são os produtos disponíveis! 🛍\nEnvie o ID do produto para ter mais informações, ou envie *voltar* para retornar ao menu inicial."
+    ],
+    "relations": [
+      {
+        "keyword": "voltar",
+        "nextInteraction": "initial-section"
+      },
+      {
+        "keyword": "_ANY_",
+        "nextInteraction": "product-info"
+      }
+    ]
+  },
+  "product-info": {
+    "body": [
+      "This is a dynamic message. If you are seeing this, something went wrong"
+    ],
+    "isDynamic": true,
+    "identifierMessage": [
+      "Precisa de mais alguma coisa? 😄\nEnvie *sim* para explorar um outro produto, ou *não* para encerrar o atendimento."
+    ],
+    "relations": [
+      {
+        "keyword": "sim",
+        "nextInteraction": "initial-section"
+      },
+      {
+        "keyword": ["não", "nao"],
+        "nextInteraction": "goodbye"
+      }
+    ]
+  },
+  "goodbye": {
+    "body": [
+      "Muito obrigado por ter usado o nosso serviço! 😁",
+      "Qualquer coisa é so me chamar, ok? Estarei sempre a disposição! 😀"
+    ],
+    "isDynamic": false,
+    "relations": [
+      {
+        "keyword": "_ANY_",
+        "nextInteraction": "initial-section"
       }
     ]
   }

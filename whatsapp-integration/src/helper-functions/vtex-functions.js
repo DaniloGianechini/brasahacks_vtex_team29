@@ -21,17 +21,20 @@ const doVtexRequest = async (url) => {
   return results;
 };
 
+// The function that most other functions make use of to gather product information
+// Search for products by search term
 async function getProductsInfoBySearchTerm(searchTerm) {
   const url = `https://cosmetics2.vtexcommercestable.com.br/api/catalog_system/pub/products/search/${searchTerm}`;
 
   const products = await doVtexRequest(url);
 
   const parsedProducts = products.map((product) => {
-    const { productName, link, description } = product;
+    const { productName, link, description, productId } = product;
     const imageUrl = product.items[0].images[0].imageUrl;
     const addToCartLink = product.items[0].sellers[0].addToCartLink;
-    const price = product.items[0].sellers[0].commertialOffer.Price;
+    const price = product.items[0].sellers[0].commertialOffer.Price.toFixed(2);
     return {
+      productId,
       productName,
       link,
       description,
@@ -44,18 +47,26 @@ async function getProductsInfoBySearchTerm(searchTerm) {
   return parsedProducts;
 }
 
-async function getProductsByCategoryId(categoryId) {
+// Get useful information of all items in a category
+async function getProductsByCategoryId(categoryId, maxAmount) {
   const url = `
     https://cosmetics2.vtexcommercestable.com.br/api/catalog_system/pvt/products/GetProductAndSkuIds?_from=1&_to=10&categoryId=${categoryId}
   `;
 
   const products = await doVtexRequest(url);
 
-  let parsedProducts = {};
+  let parsedProducts = [];
+
+  let productsCount = 0;
 
   for (productId in products.data) {
     try {
-      parsedProducts[productId] = await getProductInfoById(productId);
+      const product = await getProductInfoById(productId);
+      if (product && product.productName != "Order Tracker") {
+        parsedProducts.push(product);
+        productsCount++;
+        if (productsCount >= maxAmount) break;
+      }
     } catch (err) {
       console.error(`Product id ${productId} is broken. Error: ${err}`);
     }
@@ -99,6 +110,7 @@ async function getProductInfoById(productId) {
   }
 }
 
+// Get all categories' names and IDs
 async function getAllCategories() {
   const url = `https://cosmetics2.vtexcommercestable.com.br/api/catalog_system/pub/category/tree/10`;
 
@@ -132,15 +144,10 @@ async function test() {
   // categories.forEach((category) => {
   //   console.log(`Name: ${category.name}. ID: ${category.id}\n`);
   // });
-
   // const products = await getProductsByCategoryId(1);
   // console.log(products);
-
-  const product = await getProductInfoById(4);
-  console.log(product);
-
-  // const result = await getProductsInfoBySearchTerm("");
-  // console.log(result);
+  const result = await getProductsByCategoryId(1, 4);
+  console.log(result);
 }
 
 // test();
