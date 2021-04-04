@@ -143,7 +143,7 @@ async function test() {
   // console.log(result);
 }
 
-test();
+// test();
 
 module.exports = {
   getProductsInfoBySearchTerm,
