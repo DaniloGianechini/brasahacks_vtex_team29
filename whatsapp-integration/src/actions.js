@@ -72,7 +72,7 @@ async function handleCategoryProducts(
   nextInteraction,
   userInput
 ) {
-  const results = await vtexFunctions.getProductsByCategoryId(userInput);
+  const results = await vtexFunctions.getProductsByCategoryId(userInput, 5);
 
   const messages = results.reduce((finalArray, product) => {
     finalArray.push(
