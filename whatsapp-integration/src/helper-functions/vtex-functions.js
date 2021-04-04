@@ -51,7 +51,17 @@ async function getProductsByCategoryId(categoryId) {
 
   const products = await doVtexRequest(url);
 
-  return products;
+  let parsedProducts = {};
+
+  for (productId in products.data) {
+    try {
+      parsedProducts[productId] = await getProductInfoById(productId);
+    } catch (err) {
+      console.error(`Product id ${productId} is broken. Error: ${err}`);
+    }
+  }
+
+  return parsedProducts;
 }
 
 async function getSKUIdByProductId(productId) {
@@ -71,14 +81,22 @@ async function getPriceBySKUId(SKUId) {
 }
 
 async function getProductInfoById(productId) {
-  const url = `https://cosmetics2.vtexcommercestable.com.br/api/catalog/pvt/product/${productId}`;
+  try {
+    const url = `https://cosmetics2.vtexcommercestable.com.br/api/catalog/pvt/product/${productId}`;
 
-  const product = await doVtexRequest(url);
+    const product = await doVtexRequest(url);
+    // For some obscure reason, Vtex API doesn't provide all product information int the 'product' endpoint 🤷‍♂️
+    //  So I need to search for the item name and then get more info, like add to cart link, or image link, or the link to the store
 
-  const SKUId = await getSKUIdByProductId(productId);
-  const price = await getPriceBySKUId(SKUId);
+    // Of course, I'm assuming that no products have the same name
+    const productWithBetterInfo = await getProductsInfoBySearchTerm(
+      product.Name
+    );
 
-  return { ...product, price };
+    return productWithBetterInfo[0];
+  } catch {
+    return { error: `Product with Id ${product.Id} not found` };
+  }
 }
 
 async function getAllCategories() {
@@ -102,14 +120,27 @@ async function getAllCategories() {
     addChildren(category);
   }
 
+  allCategories.sort((a, b) => a.id - b.id);
+
   return allCategories;
 }
 
 // ------------ TESTS -------------
 
 async function test() {
-  const result = await getProductInfoById(4);
-  console.log(result);
+  // const categories = await getAllCategories();
+  // categories.forEach((category) => {
+  //   console.log(`Name: ${category.name}. ID: ${category.id}\n`);
+  // });
+
+  // const products = await getProductsByCategoryId(1);
+  // console.log(products);
+
+  const product = await getProductInfoById(4);
+  console.log(product);
+
+  // const result = await getProductsInfoBySearchTerm("");
+  // console.log(result);
 }
 
 test();
