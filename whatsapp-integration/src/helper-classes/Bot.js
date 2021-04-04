@@ -42,7 +42,7 @@ class Bot {
 
     // Get last message sent by the bot to the user
     // DANILOOO ❗❗❗❗❗❗❗ eu nao consigo testar isso aqui não, por favor ve pra mim se ele pega a última mensagem mesmo.
-    // Eu so copiei o codigo da documentação deles, eu não sei se ta certo
+    // Eu so copiei o codigo da documentação deles, eu não sei se ta certovt
     const lastBotMessage = await client.messages.list({
       from: "whatsapp:+14155238886",
       to: senderID,
