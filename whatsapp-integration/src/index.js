@@ -39,8 +39,11 @@ fs.readFile(path.join(__dirname, "interactions.json"), (err, data) => {
   bot.defineInteractionsByObject(JSON.parse(data));
 
   // Add the action to the proper interaction
-  for (action of actions) {
-    bot.defineActionByInteractionName(action.interactionName, action.func);
+  for (action in actions) {
+    bot.defineActionByInteractionName(
+      actions[action].interactionName,
+      actions[action].func
+    );
   }
 });
 
