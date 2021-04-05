@@ -24,7 +24,7 @@ webApp.get("/", (req, res) => {
   res.send(`Hello World.!`);
 });
 
-// const WA = require("./helper-functions/whatsapp-functions");
+const WA = require("./helper-functions/whatsapp-functions");
 
 const Bot = require("./helper-classes/Bot");
 const bot = new Bot("greeting");
